@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext.jsx';
 
 const NAV_LINKS = ['Home', 'Components', 'Theme', 'About'];
 
-const Header = ({ activeScreen, onNavigate }) => {
+const Header = ({ activeScreen, onNavigate, onLogout }) => {
   const { theme, fontFamily, fontSize } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -85,6 +85,18 @@ const Header = ({ activeScreen, onNavigate }) => {
       flexDirection: 'row',
       alignItems: 'center',
     },
+    // Styles for the new logout row
+    logoutDivider: {
+      height: 1,
+      backgroundColor: theme.border,
+      marginVertical: 8,
+    },
+    logoutText: {
+      fontSize: fontSize,
+      fontFamily,
+      color: theme.danger, // Dynamically maps to your theme's danger color (e.g., #ff4d6d)
+      fontWeight: '600',
+    },
   });
 
   return (
@@ -101,27 +113,46 @@ const Header = ({ activeScreen, onNavigate }) => {
       </View>
 
       {menuOpen && (
-        <View style={styles.dropdown}>
-          {NAV_LINKS.map(link => (
-            <TouchableOpacity
-              key={link}
-              style={styles.navItem}
-              onPress={() => {
-                onNavigate(link);
-                setMenuOpen(false);
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={styles.navRow}>
-                <Text style={[styles.navText, activeScreen === link && styles.navTextActive]}>
-                  {link}
-                </Text>
-                {activeScreen === link && <View style={styles.activeDot} />}
-              </View>
-            </TouchableOpacity>
-          ))}
+  <View style={styles.dropdown}>
+    {/* Main Navigation Links */}
+    {NAV_LINKS.map(link => (
+      <TouchableOpacity
+        key={link}
+        style={styles.navItem}
+        onPress={() => {
+          onNavigate(link);
+          setMenuOpen(false);
+        }}
+        activeOpacity={0.7}
+      >
+        <View style={styles.navRow}>
+          <Text style={[styles.navText, activeScreen === link && styles.navTextActive]}>
+            {link}
+          </Text>
+          {activeScreen === link && <View style={styles.activeDot} />}
         </View>
-      )}
+      </TouchableOpacity>
+    ))}
+
+    {/* Seamless Log Out Option */}
+    {onLogout && (
+      <TouchableOpacity
+        style={styles.navItem}
+        onPress={() => {
+          setMenuOpen(false);
+          onLogout();
+        }}
+        activeOpacity={0.7}
+      >
+        <View style={styles.navRow}>
+          <Text style={styles.navText}>
+            Log Out
+          </Text>
+        </View>
+      </TouchableOpacity>
+    )}
+  </View>
+)}
     </View>
   );
 };
